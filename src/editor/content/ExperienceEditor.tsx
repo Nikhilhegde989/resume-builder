@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useResumeStore } from '../../store';
-import { Field, TextInput, Checkbox, BulletEditor } from '../FormControls';
+import { Field, TextInput, Checkbox, BulletEditor, NumberInput } from '../FormControls';
 import type { ExperienceData, ExperienceItem } from '../../types';
 
 interface ItemEditorProps {
@@ -52,8 +52,16 @@ function ItemEditor({ item, sectionId, onRemove }: ItemEditorProps) {
             checked={item.current}
             onChange={v => upd({ current: v })}
           />
+          <Checkbox
+            label="Start on new page"
+            checked={!!item.pageBreakBefore}
+            onChange={v => upd({ pageBreakBefore: v })}
+          />
           <Field label="Location">
             <TextInput value={item.location} onChange={v => upd({ location: v })} placeholder="City, State" />
+          </Field>
+          <Field label="Technologies">
+            <TextInput value={item.technologies ?? ''} onChange={v => upd({ technologies: v })} placeholder="React, TypeScript, Node.js, ..." />
           </Field>
           <Field label="Bullet points">
             <BulletEditor
@@ -76,9 +84,20 @@ export function ExperienceEditor({ sectionId }: Props) {
   );
   const addItem = useResumeStore(s => s.addExperienceItem);
   const removeItem = useResumeStore(s => s.removeExperienceItem);
+  const updateData = useResumeStore(s => s.updateSectionData);
+  const sectionStyles = useResumeStore(s =>
+    s.resume.sections.find(sec => sec.id === sectionId)!.styles
+  );
 
   return (
     <div>
+      <Field label="Role title size (pt)">
+        <NumberInput
+          value={data.roleFontSize ?? sectionStyles.contentFontSize}
+          onChange={v => updateData(sectionId, { roleFontSize: v } as Partial<ExperienceData>)}
+          min={6} max={24} step={0.5}
+        />
+      </Field>
       {data.items.map(item => (
         <ItemEditor
           key={item.id}

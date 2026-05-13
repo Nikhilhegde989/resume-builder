@@ -36,11 +36,17 @@ export function HeaderEditor({ sectionId }: Props) {
       <Field label="Location">
         <TextInput value={data.location} onChange={v => upd({ location: v })} placeholder="City, State" />
       </Field>
-      <Field label="LinkedIn">
+      <Field label="LinkedIn URL">
         <TextInput value={data.linkedin} onChange={v => upd({ linkedin: v })} placeholder="linkedin.com/in/..." />
       </Field>
-      <Field label="Website / GitHub">
+      <Field label="LinkedIn display as">
+        <TextInput value={data.linkedinLabel} onChange={v => upd({ linkedinLabel: v })} placeholder="LinkedIn" />
+      </Field>
+      <Field label="Website URL">
         <TextInput value={data.website} onChange={v => upd({ website: v })} placeholder="github.com/you" />
+      </Field>
+      <Field label="Website display as">
+        <TextInput value={data.websiteLabel} onChange={v => upd({ websiteLabel: v })} placeholder="www.yoursite.com" />
       </Field>
       <Field label="Separator">
         <TextInput value={data.separator} onChange={v => upd({ separator: v })} placeholder="  ·  " />

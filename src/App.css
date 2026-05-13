@@ -398,8 +398,26 @@ select.form-input { appearance: auto; cursor: pointer; }
 
 .bullet-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
+}
+
+.bullet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.bold-btn {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 22px;
+}
+
+.link-btn {
+  font-size: 12px;
+  min-width: 22px;
 }
 
 .bullet-dot {
@@ -410,7 +428,7 @@ select.form-input { appearance: auto; cursor: pointer; }
   text-align: center;
 }
 
-.bullet-input { flex: 1; }
+.bullet-input { flex: 1; resize: none; overflow: hidden; }
 
 /* ─── Sub-items (experience, education, etc.) ───────────────────────────── */
 .sub-item {

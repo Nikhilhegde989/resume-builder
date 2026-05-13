@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { ReactNode, ChangeEvent } from 'react';
 
 // ─── Reusable form primitives ─────────────────────────────────────────────
@@ -165,6 +166,8 @@ interface BulletEditorProps {
 }
 
 export function BulletEditor({ bullets, onChange, placeholder = 'Add a bullet point...' }: BulletEditorProps) {
+  const refs = useRef<(HTMLTextAreaElement | null)[]>([]);
+
   const update = (i: number, v: string) => {
     const next = [...bullets];
     next[i] = v;
@@ -173,19 +176,82 @@ export function BulletEditor({ bullets, onChange, placeholder = 'Add a bullet po
   const remove = (i: number) => onChange(bullets.filter((_, idx) => idx !== i));
   const add = () => onChange([...bullets, '']);
 
+  const applyBold = (i: number) => {
+    const ta = refs.current[i];
+    if (!ta) return;
+    const { selectionStart, selectionEnd, value } = ta;
+    if (selectionStart === selectionEnd) return;
+    const newValue =
+      value.slice(0, selectionStart) +
+      `**${value.slice(selectionStart, selectionEnd)}**` +
+      value.slice(selectionEnd);
+    update(i, newValue);
+    setTimeout(() => {
+      ta.focus();
+      ta.selectionStart = selectionStart + 2;
+      ta.selectionEnd = selectionEnd + 2;
+    }, 0);
+  };
+
+  const applyLink = (i: number) => {
+    const ta = refs.current[i];
+    if (!ta) return;
+    const { selectionStart, selectionEnd, value } = ta;
+    if (selectionStart === selectionEnd) return;
+    const url = window.prompt('Enter URL:');
+    if (!url) return;
+    const selected = value.slice(selectionStart, selectionEnd);
+    const newValue = value.slice(0, selectionStart) + `[${selected}](${url})` + value.slice(selectionEnd);
+    update(i, newValue);
+    setTimeout(() => ta.focus(), 0);
+  };
+
   return (
     <div className="bullet-editor">
       {bullets.map((b, i) => (
         <div key={i} className="bullet-row">
           <span className="bullet-dot">•</span>
-          <input
-            type="text"
+          <textarea
+            ref={el => { refs.current[i] = el; }}
             className="form-input bullet-input"
             value={b}
+            rows={Math.max(1, (b.match(/\n/g) ?? []).length + 1)}
             onChange={e => update(i, e.target.value)}
             placeholder={placeholder}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                add();
+              } else if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+                e.preventDefault();
+                applyBold(i);
+              } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                applyLink(i);
+              }
+            }}
           />
-          <button type="button" className="icon-btn danger" onClick={() => remove(i)} title="Remove">×</button>
+          <div className="bullet-actions">
+            <button
+              type="button"
+              className="icon-btn bold-btn"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => applyBold(i)}
+              title="Bold selected text (Ctrl+B)"
+            >
+              B
+            </button>
+            <button
+              type="button"
+              className="icon-btn link-btn"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => applyLink(i)}
+              title="Add hyperlink to selected text (Ctrl+K)"
+            >
+              ↗
+            </button>
+            <button type="button" className="icon-btn danger" onClick={() => remove(i)} title="Remove">×</button>
+          </div>
         </div>
       ))}
       <button type="button" className="btn-add-small" onClick={add}>+ Add bullet</button>

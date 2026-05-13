@@ -1,4 +1,14 @@
-import { Document, Page, View, Text } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Font } from '@react-pdf/renderer';
+
+Font.register({
+  family: 'Barlow',
+  fonts: [
+    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7EPCw.ttf' },
+    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3t-4c4A.ttf', fontWeight: 700 },
+    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHrv4kjgoGqM7E_Ccs8.ttf', fontStyle: 'italic' },
+    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHsv4kjgoGqM7E_CfOA5Vop.ttf', fontWeight: 700, fontStyle: 'italic' },
+  ],
+});
 import type { ResumeData, Section } from '../types';
 import { PdfHeader } from './PdfHeader';
 import { PdfSummary } from './PdfSummary';
@@ -24,7 +34,7 @@ function SectionWrapper({ section, resume }: { section: Section; resume: ResumeD
     <View style={{ marginBottom: global.sectionSpacing }}>
       {/* Section title (skipped for header since it has its own layout) */}
       {section.type !== 'header' && (
-        <View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
           <Text
             style={{
               fontSize: styles.titleFontSize,
@@ -32,7 +42,6 @@ function SectionWrapper({ section, resume }: { section: Section; resume: ResumeD
               fontFamily: font,
               fontWeight: styles.titleBold ? 'bold' : 'normal',
               fontStyle: styles.titleItalic ? 'italic' : 'normal',
-              textAlign: styles.titleAlignment,
               textTransform: 'uppercase',
               letterSpacing: 1,
             }}
@@ -42,10 +51,10 @@ function SectionWrapper({ section, resume }: { section: Section; resume: ResumeD
           {styles.showDivider && (
             <View
               style={{
+                flex: 1,
                 borderBottomWidth: styles.dividerThickness,
                 borderBottomColor: styles.dividerColor,
-                marginTop: 2,
-                marginBottom: 5,
+                marginLeft: 6,
               }}
             />
           )}
@@ -97,6 +106,17 @@ export function ResumeDocument({ resume }: Props) {
           color: g.textColor,
         }}
       >
+        {g.showPageBorder && (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              borderWidth: 1,
+              borderColor: g.pageBorderColor ?? '#d1d5db',
+              borderStyle: 'solid',
+            }}
+          />
+        )}
         {visibleSections.map(section => (
           <SectionWrapper key={section.id} section={section} resume={resume} />
         ))}

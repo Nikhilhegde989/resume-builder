@@ -56,8 +56,8 @@ function ItemEditor({ item, sectionId, onRemove }: ItemEditorProps) {
             <Field label="Location">
               <TextInput value={item.location} onChange={v => upd({ location: v })} placeholder="City, ST" />
             </Field>
-            <Field label="GPA">
-              <TextInput value={item.gpa} onChange={v => upd({ gpa: v })} placeholder="3.8" />
+            <Field label="GPA / Score">
+              <TextInput value={item.gpa} onChange={v => upd({ gpa: v })} placeholder="GPA: 3.8 or 84%" />
             </Field>
           </div>
           <Field label="Bullet points (optional)">

@@ -19,35 +19,35 @@ export function PdfEducation({ data, styles, global }: Props) {
           key={item.id}
           style={{ marginBottom: idx < data.items.length - 1 ? styles.itemSpacing : 0 }}
         >
-          {/* Institution + Date */}
+          {/* Row 1: Institution (left) | Date (right) */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Text style={{ fontSize: fs, fontFamily: font, fontWeight: 'bold', color }}>
               {item.institution}
             </Text>
-            <Text style={{ fontSize: fs - 1, fontFamily: font, color, flexShrink: 0 }}>
+            <Text style={{ fontSize: global.dateFontSize ?? 9, fontFamily: font, color, fontWeight: global.dateBold ? 'bold' : 'normal', flexShrink: 0 }}>
               {item.startDate}{item.startDate && (item.current || item.endDate) ? ' – ' : ''}
               {item.current ? 'Present' : item.endDate}
             </Text>
           </View>
 
-          {/* Degree + Location */}
+          {/* Row 2: Degree + GPA (left) | Location (right) */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Text style={{ fontSize: fs, fontFamily: font, color: global.secondaryColor, fontStyle: 'italic' }}>
               {[item.degree, item.field].filter(Boolean).join(' in ')}
-              {item.gpa ? `  ·  GPA: ${item.gpa}` : ''}
+              {item.gpa ? `  ·  ${item.gpa}` : ''}
             </Text>
             {item.location ? (
-              <Text style={{ fontSize: fs - 1, fontFamily: font, color, flexShrink: 0 }}>
+              <Text style={{ fontSize: global.locationFontSize ?? 9, fontFamily: font, color, fontWeight: global.locationBold ? 'bold' : 'normal', flexShrink: 0, marginLeft: 8 }}>
                 {item.location}
               </Text>
             ) : null}
           </View>
 
+          {/* Bullets — full width */}
           {item.bullets.filter(Boolean).map((bullet, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginTop: 2, paddingLeft: 10 }}>
-              <Text style={{ fontSize: fs, fontFamily: font, color, marginRight: 4 }}>•</Text>
-              <Text style={{ fontSize: fs, fontFamily: font, color, flex: 1, lineHeight: global.lineHeight }}>
-                {bullet}
+            <View key={i} style={{ marginTop: 2, paddingLeft: 10 }}>
+              <Text style={{ fontSize: fs, fontFamily: font, color, lineHeight: global.lineHeight }}>
+                {'• ' + bullet}
               </Text>
             </View>
           ))}

@@ -56,6 +56,7 @@ interface ResumeStore {
   duplicateSection: (id: string) => void;
   updateSectionTitle: (id: string, title: string) => void;
   updateSectionStyles: (id: string, updates: Partial<SectionStyles>) => void;
+  updateAllSectionStyles: (updates: Partial<SectionStyles>) => void;
   updateSectionData: (id: string, updates: Partial<SectionData>) => void;
   toggleVisibility: (id: string) => void;
   reorderSections: (newOrder: Section[]) => void;
@@ -72,6 +73,7 @@ interface ResumeStore {
   addSkillCategory: (sectionId: string) => void;
   removeSkillCategory: (sectionId: string, catId: string) => void;
   updateSkillCategory: (sectionId: string, catId: string, updates: Partial<SkillsData['categories'][0]>) => void;
+  reorderSkillCategories: (sectionId: string, newOrder: SkillsData['categories']) => void;
 
   addProjectItem: (sectionId: string) => void;
   removeProjectItem: (sectionId: string, itemId: string) => void;
@@ -80,6 +82,7 @@ interface ResumeStore {
   addCustomItem: (sectionId: string) => void;
   removeCustomItem: (sectionId: string, itemId: string) => void;
   updateCustomItem: (sectionId: string, itemId: string, updates: Partial<CustomData['items'][0]>) => void;
+  reorderCustomItems: (sectionId: string, newOrder: CustomData['items']) => void;
 
   // UI
   selectSection: (id: string | null) => void;
@@ -155,6 +158,17 @@ export const useResumeStore = create<ResumeStore>()(
           },
         })),
 
+      updateAllSectionStyles: (updates) =>
+        set(state => ({
+          resume: {
+            ...state.resume,
+            sections: state.resume.sections.map(s => ({
+              ...s,
+              styles: { ...s.styles, ...updates },
+            })),
+          },
+        })),
+
       updateSectionData: (id, updates) =>
         set(state => ({
           resume: {
@@ -189,7 +203,7 @@ export const useResumeStore = create<ResumeStore>()(
                 ...(s.data as ExperienceData),
                 items: [
                   ...(s.data as ExperienceData).items,
-                  { id: uid(), company: '', role: '', startDate: '', endDate: '', current: false, location: '', bullets: [] },
+                  { id: uid(), company: '', role: '', startDate: '', endDate: '', current: false, location: '', technologies: '', bullets: [] },
                 ],
               },
             })),
@@ -324,6 +338,17 @@ export const useResumeStore = create<ResumeStore>()(
           },
         })),
 
+      reorderSkillCategories: (sectionId, newOrder) =>
+        set(state => ({
+          resume: {
+            ...state.resume,
+            sections: updateSection(state.resume.sections, sectionId, s => ({
+              ...s,
+              data: { ...(s.data as SkillsData), categories: newOrder },
+            })),
+          },
+        })),
+
       // ─── Projects ────────────────────────────────────────────────────────
 
       addProjectItem: (sectionId) =>
@@ -385,7 +410,7 @@ export const useResumeStore = create<ResumeStore>()(
                 ...(s.data as CustomData),
                 items: [
                   ...(s.data as CustomData).items,
-                  { id: uid(), title: '', subtitle: '', date: '', content: '' },
+                  { id: uid(), title: '', subtitle: '', date: '', content: '', link: '', bullets: [] },
                 ],
               },
             })),
@@ -422,6 +447,17 @@ export const useResumeStore = create<ResumeStore>()(
           },
         })),
 
+      reorderCustomItems: (sectionId, newOrder) =>
+        set(state => ({
+          resume: {
+            ...state.resume,
+            sections: updateSection(state.resume.sections, sectionId, s => ({
+              ...s,
+              data: { ...(s.data as CustomData), items: newOrder },
+            })),
+          },
+        })),
+
       // ─── UI ──────────────────────────────────────────────────────────────
 
       selectSection: (id) => set({ selectedSectionId: id }),
@@ -432,6 +468,73 @@ export const useResumeStore = create<ResumeStore>()(
     }),
     {
       name: 'resume-builder-v1',
+      version: 5,
+      migrate: (persisted: unknown, version: number) => {
+        const state = persisted as { resume: ResumeData };
+        if (version < 2) {
+          state.resume = {
+            ...state.resume,
+            globalStyles: { ...state.resume.globalStyles, primaryColor: '#2563eb' },
+            sections: state.resume.sections.map(s => ({
+              ...s,
+              styles: { ...s.styles, titleColor: '#2563eb', dividerColor: '#2563eb' },
+            })),
+          };
+        }
+        if (version < 3) {
+          state.resume = {
+            ...state.resume,
+            globalStyles: { ...state.resume.globalStyles, sectionSpacing: 16 },
+          };
+        }
+        if (version < 4) {
+          state.resume = {
+            ...state.resume,
+            sections: state.resume.sections.map(s => {
+              if (s.type === 'experience') {
+                const data = s.data as ExperienceData;
+                return {
+                  ...s,
+                  data: {
+                    ...data,
+                    items: data.items.map(item => ({
+                      technologies: '',
+                      ...item,
+                    })),
+                  },
+                };
+              }
+              if (s.type === 'custom') {
+                const data = s.data as CustomData;
+                return {
+                  ...s,
+                  data: {
+                    ...data,
+                    items: data.items.map(item => ({
+                      bullets: [],
+                      ...item,
+                    })),
+                  },
+                };
+              }
+              return s;
+            }),
+          };
+        }
+        if (version < 5) {
+          state.resume = {
+            ...state.resume,
+            globalStyles: {
+              dateFontSize: 9,
+              dateBold: false,
+              locationFontSize: 9,
+              locationBold: false,
+              ...state.resume.globalStyles,
+            },
+          };
+        }
+        return state;
+      },
     }
   )
 );

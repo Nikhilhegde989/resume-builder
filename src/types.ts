@@ -1,4 +1,4 @@
-export type FontFamily = 'Helvetica' | 'Times-Roman' | 'Courier';
+export type FontFamily = 'Helvetica' | 'Times-Roman' | 'Courier' | 'Barlow';
 export type PageSize = 'A4' | 'LETTER';
 export type Alignment = 'left' | 'center' | 'right';
 export type SectionType = 'header' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'custom';
@@ -17,6 +17,12 @@ export interface GlobalStyles {
   marginLeft: number;
   sectionSpacing: number;    // pt between sections
   lineHeight: number;        // multiplier
+  showPageBorder?: boolean;
+  pageBorderColor?: string;
+  dateFontSize: number;
+  dateBold: boolean;
+  locationFontSize: number;
+  locationBold: boolean;
 }
 
 export interface SectionStyles {
@@ -42,7 +48,9 @@ export interface HeaderData {
   phone: string;
   location: string;
   linkedin: string;
+  linkedinLabel: string;
   website: string;
+  websiteLabel: string;
   nameSize: number;
   nameColor: string;
   titleSize: number;
@@ -65,10 +73,13 @@ export interface ExperienceItem {
   endDate: string;
   current: boolean;
   location: string;
+  technologies: string;
   bullets: string[];
+  pageBreakBefore?: boolean;
 }
 
 export interface ExperienceData {
+  roleFontSize?: number;
   items: ExperienceItem[];
 }
 
@@ -119,9 +130,12 @@ export interface CustomItem {
   subtitle: string;
   date: string;
   content: string;
+  link: string;
+  bullets: string[];
 }
 
 export interface CustomData {
+  showItemBullet?: boolean;
   items: CustomItem[];
 }
 

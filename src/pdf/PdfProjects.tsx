@@ -1,5 +1,6 @@
 import { View, Text, Link } from '@react-pdf/renderer';
 import type { ProjectsData, SectionStyles, GlobalStyles } from '../types';
+import { renderRichText } from './richText';
 
 interface Props {
   data: ProjectsData;
@@ -50,11 +51,8 @@ export function PdfProjects({ data, styles, global }: Props) {
 
           {/* Bullets */}
           {item.bullets.filter(Boolean).map((bullet, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginTop: 2, paddingLeft: 10 }}>
-              <Text style={{ fontSize: fs, fontFamily: font, color, marginRight: 4 }}>•</Text>
-              <Text style={{ fontSize: fs, fontFamily: font, color, flex: 1, lineHeight: global.lineHeight }}>
-                {bullet}
-              </Text>
+            <View key={i} style={{ marginTop: 2, paddingLeft: 10 }}>
+              {renderRichText('• ' + bullet, { fontSize: fs, fontFamily: font, color, lineHeight: global.lineHeight })}
             </View>
           ))}
         </View>
