@@ -3,10 +3,10 @@ import { Document, Page, View, Text, Font } from '@react-pdf/renderer';
 Font.register({
   family: 'Barlow',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7EPCw.ttf' },
-    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3t-4c4A.ttf', fontWeight: 700 },
-    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHrv4kjgoGqM7E_Ccs8.ttf', fontStyle: 'italic' },
-    { src: 'https://fonts.gstatic.com/s/barlow/v13/7cHsv4kjgoGqM7E_CfOA5Vop.ttf', fontWeight: 700, fontStyle: 'italic' },
+    { src: '/fonts/Barlow-Regular.ttf' },
+    { src: '/fonts/Barlow-Bold.ttf', fontWeight: 700 },
+    { src: '/fonts/Barlow-Italic.ttf', fontStyle: 'italic' },
+    { src: '/fonts/Barlow-BoldItalic.ttf', fontWeight: 700, fontStyle: 'italic' },
   ],
 });
 import type { ResumeData, Section } from '../types';
@@ -90,9 +90,17 @@ function SectionWrapper({ section, resume }: { section: Section; resume: ResumeD
 export function ResumeDocument({ resume }: Props) {
   const { globalStyles: g } = resume;
   const visibleSections = resume.sections.filter(s => s.visible);
+  const headerSection = resume.sections.find(s => s.type === 'header');
+  const authorName = headerSection ? (headerSection.data as HeaderData).name : 'Resume';
 
   return (
-    <Document>
+    <Document
+      title={authorName}
+      author={authorName}
+      subject="Resume"
+      creator="Resume Builder"
+      producer="Resume Builder"
+    >
       <Page
         size={g.pageSize}
         style={{
